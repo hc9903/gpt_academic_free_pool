@@ -1,6 +1,10 @@
 ***使用 Share Token 池的 [Docker 镜像](https://hub.docker.com/r/superzer000/gpt_academic_free_pool_with_latex)***
-本项目使用 GitHub Action 打包使用了免费公共 API 池的 gpt_academic_with_latex 容器
-来源: [FreeAI](https://github.com/elphen-wang/FreeAI)
+
+
+本项目使用 GitHub Action 打包使用了免费公共 API 池的 gpt_academic_with_latex 容器(来源: [FreeAI](https://github.com/elphen-wang/FreeAI))
+
+
+
 ---
 
 
