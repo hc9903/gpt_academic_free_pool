@@ -1,3 +1,7 @@
+***使用 Share Token 池的 [Docker 镜像](https://hub.docker.com/r/superzer000/gpt_academic_free_pool_with_latex)***
+---
+
+
 > **Note**
 >
 > 2023.7.8: Gradio, Pydantic依赖调整，已修改 `requirements.txt`。请及时**更新代码**，安装依赖时，请严格选择`requirements.txt`中**指定的版本**
