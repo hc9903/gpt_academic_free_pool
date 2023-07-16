@@ -214,7 +214,7 @@ def write_results_to_file(history, file_name=None):
                 # remove everything that cannot be handled by utf8
                 f.write(content.encode('utf-8', 'ignore').decode())
             f.write('\n\n')
-    res = '以上材料已经被写入:\t' + os.path.abspath(f'./gpt_log/{file_name}')
+    res = '以上材料已经被写入' + os.path.abspath(f'./gpt_log/{file_name}')
     print(res)
     return res
 
@@ -467,11 +467,8 @@ def promote_file_to_downloadzone(file, rename_file=None, chatbot=None):
     import shutil
     if rename_file is None: rename_file = f'{gen_time_str()}-{os.path.basename(file)}'
     new_path = os.path.join(f'./gpt_log/', rename_file)
-    # 如果已经存在，先删除
     if os.path.exists(new_path) and not os.path.samefile(new_path, file): os.remove(new_path)
-    # 把文件复制过去
     if not os.path.exists(new_path): shutil.copyfile(file, new_path)
-    # 将文件添加到chatbot cookie中，避免多用户干扰
     if chatbot:
         if 'file_to_promote' in chatbot._cookies: current = chatbot._cookies['file_to_promote']
         else: current = []
@@ -535,6 +532,7 @@ def load_chat_cookies():
     if is_any_api_key(AZURE_API_KEY):
         if is_any_api_key(API_KEY): API_KEY = API_KEY + ',' + AZURE_API_KEY
         else: API_KEY = AZURE_API_KEY
+    #print(API_KEY)
     return {'api_key': API_KEY, 'llm_model': LLM_MODEL}
 
 def is_openai_api_key(key):
@@ -548,6 +546,11 @@ def is_azure_api_key(key):
 def is_api2d_key(key):
     API_MATCH_API2D = re.match(r"fk[a-zA-Z0-9]{6}-[a-zA-Z0-9]{32}$", key)
     return bool(API_MATCH_API2D)
+    
+def is_freeai_api_key(key):#new add
+    API_MATCH_FREEAI0 = re.match(r"pk-[a-zA-Z0-9-]{43}$", key)
+    API_MATCH_FREEAI1 = re.match(r"fk-[a-zA-Z0-9-]{43}$", key)
+    return bool(API_MATCH_FREEAI0) or bool(API_MATCH_FREEAI1)
 
 def is_any_api_key(key):
     if ',' in key:
@@ -555,11 +558,11 @@ def is_any_api_key(key):
         for k in keys:
             if is_any_api_key(k): return True
         return False
-    else:
-        return is_openai_api_key(key) or is_api2d_key(key) or is_azure_api_key(key)
+    else:#new add
+        return is_openai_api_key(key) or is_api2d_key(key) or is_azure_api_key(key) or is_freeai_api_key(key)
 
-def what_keys(keys):
-    avail_key_list = {'OpenAI Key':0, "Azure Key":0, "API2D Key":0}
+def what_keys(keys):#new add
+    avail_key_list = {'OpenAI Key':0, "Azure Key":0, "API2D Key":0, "FreeAI Key":0}
     key_list = keys.split(',')
 
     for k in key_list:
@@ -573,8 +576,13 @@ def what_keys(keys):
     for k in key_list:
         if is_azure_api_key(k): 
             avail_key_list['Azure Key'] += 1
-
-    return f"检测到： OpenAI Key {avail_key_list['OpenAI Key']} 个, Azure Key {avail_key_list['Azure Key']} 个, API2D Key {avail_key_list['API2D Key']} 个"
+            
+    for k in key_list: # new add
+        if is_freeai_api_key(k):
+            avail_key_list['FreeAI Key'] += 1
+            
+#new add
+    return f"检测到： OpenAI Key {avail_key_list['OpenAI Key']} 个, Azure Key {avail_key_list['Azure Key']} 个, API2D Key {avail_key_list['API2D Key']} 个, FreeAI Key {avail_key_list['FreeAI Key']} 个"
 
 def select_api_key(keys, llm_model):
     import random
@@ -584,6 +592,8 @@ def select_api_key(keys, llm_model):
     if llm_model.startswith('gpt-'):
         for k in key_list:
             if is_openai_api_key(k): avail_key_list.append(k)
+        for k in key_list:# new add
+            if is_freeai_api_key(k): avail_key_list.append(k)
 
     if llm_model.startswith('api2d-'):
         for k in key_list:
