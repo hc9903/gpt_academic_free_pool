@@ -13,7 +13,7 @@ on:
         description: 'Test scenario tags'
 
 env:
-  IMAGE_NAME: ${{ github.repository }}_with_latex
+  IMAGE_NAME: gpt_academic_free_pool_with_latex
 
 jobs:
   build-and-push-image:
